@@ -1,0 +1,69 @@
+# Slack app manifest for Osada. Paste it at https://api.slack.com/apps → Create New App → From a manifest.
+# It starts in Socket Mode for local development. For production (HTTP mode), set `socket_mode_enabled: false`
+# and replace https://osada.example.com with your server's public URL everywhere below.
+display_information:
+  name: Osada
+  description: Děkuj kolegům surovinami a stavějte společně osadu.
+  background_color: "#2f6b8f"
+  long_description: >-
+    Osada je hra na poděkování. Kdo ti pomůže, tomu pošli /dekuju @kolega za co, a dostane surovinu tvého týmu.
+    Za suroviny od ostatních se staví cesty, osady a města na společné šestiúhelníkové mapě. Body jdou týmu a po
+    sezóně vyhrává tým s nejvíc body. Pravidla vypíše /osada pomoc.
+features:
+  app_home:
+    home_tab_enabled: true
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: true
+  bot_user:
+    display_name: Osada
+    always_online: true
+  shortcuts:
+    - name: Poděkovat
+      type: message
+      callback_id: podekovat
+      description: Poděkuj autorovi zprávy a pošli mu surovinu
+  slash_commands:
+    - command: /dekuju
+      url: https://osada.example.com/slack/events
+      description: Poděkuj kolegovi a pošli mu surovinu svého týmu
+      usage_hint: "@kolega za co děkuješ"
+      should_escape: true
+    - command: /stavet
+      url: https://osada.example.com/slack/events
+      description: Postav cestu, osadu nebo město
+      should_escape: true
+    - command: /smena
+      url: https://osada.example.com/slack/events
+      description: Nabídni směnu surovin, nebo směňuj s bankou
+      usage_hint: "[banka]"
+      should_escape: true
+    - command: /osada
+      url: https://osada.example.com/slack/events
+      description: Pravidla a tvůj stav ve hře
+      usage_hint: "pomoc | stav | mapa | historie | odhlasit | prihlasit"
+      should_escape: true
+    - command: /osada-admin
+      url: https://osada.example.com/slack/events
+      description: Správa hry (jen pro adminy)
+      usage_hint: "pomoc"
+      should_escape: true
+oauth_config:
+  scopes:
+    bot:
+      - commands
+      - chat:write
+      - chat:write.public
+      - users:read
+      - usergroups:read
+      - im:write
+settings:
+  event_subscriptions:
+    request_url: https://osada.example.com/slack/events
+    bot_events:
+      - app_home_opened
+  interactivity:
+    is_enabled: true
+    request_url: https://osada.example.com/slack/events
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false
