@@ -1,11 +1,9 @@
 # Osada
 
 A kudos game for Slack. The only way resources enter the game is by thanking a colleague: thank someone with
-`/dekuju @kolega za co` and they receive one unit of your team's resource. Players spend what they receive on roads,
+`/thanks @colleague for what` and they receive one unit of your team's resource. Players spend what they receive on roads,
 settlements and cities on a shared hex map, and their team scores the points. Every building needs several
 *different* resources, so you can't build from your own team's resource alone. Helping across teams is how you win.
-
-All player-facing text is in Czech.
 
 ## How it plays
 
@@ -14,17 +12,17 @@ All player-facing text is in Czech.
   allowance expires at Monday 00:00 (Europe/Prague).
 - You can thank the same person once a week, never yourself. Every thanks is posted in the thanks channel, and the
   recipient gets a DM.
-- Received resources go into your **inventory**. Spend them with `/stavet`:
+- Received resources go into your **inventory**. Spend them with `/build`:
   - **road**: 2 different resources, 1 point. It must touch your team's network.
   - **settlement**: 3 different resources, 3 points. It goes on your team's roads, and never right next to another settlement.
   - **city**: 4 different resources (capped at the number of resources in play). It upgrades your settlement, for 6 points in total.
 - Every week, settlements harvest 1 and cities 2 of each adjacent tile's resource. Deserts yield nothing.
-- Trade with others (`/smena`) or with the bank at 3:1 (`/smena banka`). Open offers expire at the weekly rollover.
+- Trade with others (`/trade`) or with the bank at 3:1 (`/trade bank`). Open offers expire at the weekly rollover.
 - The team with the longest continuous road (at least 5) gets +2 points. A season lasts 6 weeks, and the team with
   the most points wins. Then the map resets.
 - App Home shows your team, inventory, allowance, buildings, the map, the scoreboard and recent thanks.
-- `/osada pomoc` explains the rules in Czech. `/osada stav`, `/osada mapa` and `/osada historie` show your status,
-  the map link and past winners. `/osada odhlasit` and `/osada prihlasit` opt you out and back in.
+- `/osada help` explains the rules. `/osada status`, `/osada map` and `/osada history` show your status, the map
+  link and past winners. `/osada leave` and `/osada join` opt you out and back in.
 
 ## Install into Slack
 
@@ -35,8 +33,8 @@ PGlite database.
 
 1. Open <https://api.slack.com/apps> and choose **Create New App → From a manifest**.
 2. Pick your workspace, paste the contents of [`slack-manifest.yaml`](slack-manifest.yaml) (YAML tab) and create
-   the app. The manifest declares the slash commands (`/dekuju`, `/stavet`, `/smena`, `/osada`, `/osada-admin`),
-   the **Poděkovat** message shortcut, App Home, interactivity, and the bot scopes `commands`, `chat:write`,
+   the app. The manifest declares the slash commands (`/thanks`, `/build`, `/trade`, `/osada`, `/osada-admin`),
+   the **Thank** message shortcut, App Home, interactivity, and the bot scopes `commands`, `chat:write`,
    `chat:write.public`, `users:read`, `usergroups:read` and `im:write`.
 3. Choose **Install to Workspace** and allow it.
 
@@ -83,26 +81,26 @@ Slack fetches map images from the internet, so a local app shows no map unless y
 
 ### 5. Set up the game in Slack
 
-Run these as one of the `OSADA_ADMINS` (`/osada-admin pomoc` lists every admin command):
+Run these as one of the `OSADA_ADMINS` (`/osada-admin help` lists every admin command):
 
 ```text
-/osada-admin tym "Engineering" #d94f30 ruda
-/osada-admin tym "Design" #3b7dd8 vlna
-/osada-admin tym "Sales" #e0b020 obilí
-/osada-admin hrac @jana Engineering
-/osada-admin skupina @design-team Design
-/osada-admin kanal diky #osada
-/osada-admin kanal smena #osada-smeny
-/osada-admin kanal digest #osada
-/osada-admin sezona start 6
+/osada-admin team "Engineering" #d94f30 ore
+/osada-admin team "Design" #3b7dd8 wool
+/osada-admin team "Sales" #e0b020 grain
+/osada-admin player @jana Engineering
+/osada-admin group @design-team Design
+/osada-admin channel thanks #osada
+/osada-admin channel trade #osada-trades
+/osada-admin channel digest #osada
+/osada-admin season start 6
 ```
 
-- You need 3–6 teams, each with a different resource: `ruda`, `vlna`, `obilí`, `dřevo`, `cihly` or `sklo`.
+- You need 3–6 teams, each with a different resource: `ore`, `wool`, `grain`, `wood`, `brick` or `glass`.
 - The app can post to public channels without being invited. Invite it to private channels (`/invite @Osada`).
-- Tune the balance with `/osada-admin nastav <klíč> <hodnota>`. The keys are `prideleni`,
-  `prideleni-maly-tym`, `maly-tym`, `casova-zona`, `cena-cesta`, `cena-osada`, `cena-mesto`, `delka-sezony` and
-  `banka`.
-- `/osada-admin dar @kolega 2 ruda Výhra v kvízu` grants resources (as a quiz prize, say). `/osada-admin audit`
+- Tune the balance with `/osada-admin set <key> <value>`. The keys are `allowance`, `small-team-allowance`,
+  `small-team-size`, `timezone`, `cost-road`, `cost-settlement`, `cost-city`, `season-weeks`, `bank-rate` and
+  `min-reason`.
+- `/osada-admin grant @colleague 2 ore Quiz prize` grants resources (as a quiz prize, say). `/osada-admin audit`
   shows the ledger of every resource movement.
 
 ### 6. Deploy with Docker
