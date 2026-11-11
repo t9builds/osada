@@ -107,7 +107,7 @@ function buildGeometry(size: BoardSize): Geometry {
   });
 
   const height = 3 * rows.length + 1;
-  return { size, tiles, vertices, edges, width: 2 * maxLen + 2, height };
+  return { size, tiles, vertices, edges, width: 2 * maxLen, height };
 }
 
 function labelPoints(points: { x: number; y: number }[]): Map<string, string> {
