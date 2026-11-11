@@ -1,0 +1,15 @@
+{
+  "token": "verification-token",
+  "team_id": "T0001",
+  "team_domain": "acme",
+  "channel_id": "C0GENERAL",
+  "channel_name": "general",
+  "user_id": "e1",
+  "user_name": "eva",
+  "command": "/dekuju",
+  "text": "<@d1|dana> za skvělý návrh onboarding obrazovky",
+  "api_app_id": "A0OSADA",
+  "is_enterprise_install": "false",
+  "response_url": "https://hooks.slack.com/commands/T0001/1/abc",
+  "trigger_id": "1.2.abc"
+}

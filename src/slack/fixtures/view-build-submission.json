@@ -1,0 +1,26 @@
+{
+  "type": "view_submission",
+  "team": { "id": "T0001", "domain": "acme" },
+  "user": { "id": "e1", "username": "eva", "name": "eva", "team_id": "T0001" },
+  "api_app_id": "A0OSADA",
+  "trigger_id": "1.2.def",
+  "view": {
+    "id": "V0BUILD",
+    "type": "modal",
+    "callback_id": "build_modal",
+    "private_metadata": "",
+    "state": {
+      "values": {
+        "location": {
+          "value": {
+            "type": "static_select",
+            "selected_option": {
+              "text": { "type": "plain_text", "text": "Cesta A1-B1", "emoji": true },
+              "value": "road|A1-B1"
+            }
+          }
+        }
+      }
+    }
+  }
+}
