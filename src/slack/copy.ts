@@ -28,7 +28,6 @@ export const REJECTIONS: Record<Rejection, string> = {
   RESOURCE_NOT_IN_PLAY: "Tuhle surovinu v této hře žádný tým nevyrábí.",
   TOO_FEW_TEAMS: "Na sezónu jsou potřeba aspoň 3 týmy.",
   TOO_MANY_TEAMS: "Hra podporuje nejvýš 6 týmů.",
-  TEAM_NAME_TAKEN: "Tým s tímto jménem už existuje.",
   RESOURCE_TAKEN: "Tuhle surovinu už vyrábí jiný tým.",
   UNKNOWN_TEAM: "Takový tým neznám.",
   INVALID_COLOR: "Barvu zadej jako #rrggbb, např. #d94f30.",

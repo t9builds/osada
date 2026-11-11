@@ -42,7 +42,6 @@ export type Rejection =
   | "RESOURCE_NOT_IN_PLAY"
   | "TOO_FEW_TEAMS"
   | "TOO_MANY_TEAMS"
-  | "TEAM_NAME_TAKEN"
   | "RESOURCE_TAKEN"
   | "UNKNOWN_TEAM"
   | "INVALID_COLOR"
