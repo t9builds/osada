@@ -1,14 +1,14 @@
-/** Czech names and map colours of resources and tiles, shared by the Slack copy and the map renderer. */
+/** Display names and map colours of resources and tiles, shared by the Slack copy and the map renderer. */
 import type { TileKind } from "../engine/generate.ts";
 import type { Resource } from "../engine/resources.ts";
 
 export const RESOURCE_NAMES: Record<Resource, string> = {
-  wood: "dřevo",
-  brick: "cihly",
-  wool: "vlna",
-  grain: "obilí",
-  ore: "ruda",
-  glass: "sklo",
+  wood: "wood",
+  brick: "brick",
+  wool: "wool",
+  grain: "grain",
+  ore: "ore",
+  glass: "glass",
 };
 
 export const RESOURCE_EMOJI: Record<Resource, string> = {
@@ -31,11 +31,11 @@ export const TILE_COLORS: Record<TileKind, string> = {
 };
 
 export const TILE_LABELS: Record<TileKind, string> = {
-  wood: "Dřevo",
-  brick: "Cihly",
-  wool: "Vlna",
-  grain: "Obilí",
-  ore: "Ruda",
-  glass: "Sklo",
-  desert: "Pustina",
+  wood: "Wood",
+  brick: "Brick",
+  wool: "Wool",
+  grain: "Grain",
+  ore: "Ore",
+  glass: "Glass",
+  desert: "Desert",
 };

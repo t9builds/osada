@@ -32,7 +32,7 @@ describe("season start", () => {
   test("scales the board with the number of teams", async () => {
     const { game } = await startedGame({
       teams: ["ore", "wool", "grain", "wood", "brick"].map((resource, i) => ({
-        name: `Tým ${i}`,
+        name: `Team ${i}`,
         resource: resource as "ore",
         players: [`p${i}`],
       })),
@@ -92,8 +92,8 @@ describe("week rollover", () => {
 
   test("the weekly digest summarises the week that ended", async () => {
     const { game, clock } = await startedGame();
-    expectOk(await game.thank("e1", "d1", "Krátké díky"));
-    expectOk(await game.thank("e2", "d1", "Velmi dlouhé a podrobné poděkování za pomoc s releasem"));
+    expectOk(await game.thank("e1", "d1", "Short thanks"));
+    expectOk(await game.thank("e2", "d1", "A long and detailed thank-you for helping with the release"));
     clock.advanceDays(7);
     expectOk(await game.rollWeek());
     const digest = (await game.weeklyDigest())!;
@@ -107,9 +107,9 @@ describe("week rollover", () => {
 describe("season end", () => {
   test("ends after its last week with the winner and highlights, and resets inventories", async () => {
     const { game, clock } = await startedGame();
-    expectOk(await game.thank("e1", "d1", "Díky za pomoc"));
-    expectOk(await game.thank("s1", "d1", "Díky za pomoc"));
-    expectOk(await game.thank("e2", "e3", "Díky za pomoc"));
+    expectOk(await game.thank("e1", "d1", "Thanks for the help"));
+    expectOk(await game.thank("s1", "d1", "Thanks for the help"));
+    expectOk(await game.thank("e2", "e3", "Thanks for the help"));
     await buildFirstSettlement(game, "d2");
     let ended: ReturnType<typeof eventOf<"SeasonEnded">>;
     for (let week = 0; week < 6; week++) {
@@ -122,7 +122,7 @@ describe("season end", () => {
     expect(ended!.result.mostCrossTeamThanks).toEqual({ player: "e1", count: 1 });
     expect(ended!.result.totalThanks).toBe(3);
 
-    expect(await game.thank("e1", "d1", "Díky za pomoc")).toEqual({ ok: false, reason: "NO_ACTIVE_SEASON" });
+    expect(await game.thank("e1", "d1", "Thanks for the help")).toEqual({ ok: false, reason: "NO_ACTIVE_SEASON" });
     const history = await game.seasonHistory();
     expect(history).toHaveLength(1);
     expect(history[0]!.result.winners[0]!.name).toBe("Design");

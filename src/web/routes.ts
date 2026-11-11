@@ -41,7 +41,7 @@ async function mapRoute(deps: WebDeps, token: string, image: boolean): Promise<R
   const ref = readMapToken(deps.mapSecret, token);
   const board = ref && (await deps.game.board(ref.seasonId));
   if (!board) return new Response("Not found", { status: 404 });
-  const title = `Osada – sezóna ${board.seasonId}`;
+  const title = `Osada – season ${board.seasonId}`;
   const svg = renderMapSvg(board, { title });
   if (image) {
     const png = svgToPng(svg, 1200);

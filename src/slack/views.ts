@@ -31,7 +31,7 @@ export const IDS = {
   acceptOffer: "accept_offer",
   cancelOffer: "cancel_offer",
   mapLink: "map_link",
-  thanksShortcut: "podekovat",
+  thanksShortcut: "thank",
 } as const;
 
 const text = (t: string): types.PlainTextElement => ({ type: "plain_text", text: t, emoji: true });
@@ -46,14 +46,14 @@ function mapImage(links: MapLinks | null, alt: string): Block[] {
 }
 
 function quote(t: ThanksSummary, who: string): string {
-  return `• ${who} – „${t.reason}“ (${copy.resource(t.resource)})`;
+  return `• ${who} – “${t.reason}” (${copy.resource(t.resource)})`;
 }
 
 export function scoreboardLines(scoreboard: TeamScore[]): string {
-  if (!scoreboard.length) return "Zatím žádné body.";
+  if (!scoreboard.length) return "No points yet.";
   return scoreboard
     .map((s, i) => {
-      const bonus = s.bonus ? ` _(+${s.bonus} nejdelší cesta)_` : "";
+      const bonus = s.bonus ? ` _(+${s.bonus} longest road)_` : "";
       return `${i + 1}. *${s.team.name}* – ${copy.points(s.points)}${bonus}`;
     })
     .join("\n");
@@ -68,13 +68,13 @@ export function homeView(view: PlayerView, links: MapLinks | null, history: Seas
   else if (!view.team) blocks.push(section(copy.NO_TEAM_YET));
 
   if (!view.season) {
-    blocks.push(section("Právě neběží žádná sezóna. Až ji admin spustí, objeví se tu mapa a tvoje suroviny."));
+    blocks.push(section("No season is running. When an admin starts one, the map and your resources show up here."));
   } else {
     blocks.push(...seasonBlocks(view, links));
   }
   if (history.length) {
-    const lines = history.slice(0, 5).map((s) => `• Sezóna ${s.id}: ${winnerNames(s.result)}`);
-    blocks.push(divider, section(`*Minulé sezóny*\n${lines.join("\n")}`));
+    const lines = history.slice(0, 5).map((s) => `• Season ${s.id}: ${winnerNames(s.result)}`);
+    blocks.push(divider, section(`*Past seasons*\n${lines.join("\n")}`));
   }
   return { type: "home", blocks };
 }
@@ -82,28 +82,28 @@ export function homeView(view: PlayerView, links: MapLinks | null, history: Seas
 function seasonBlocks(view: PlayerView, links: MapLinks | null): Block[] {
   const season = view.season!;
   const blocks: Block[] = [
-    context(`Sezóna ${season.id} · týden ${Math.min(season.weekNumber, season.weeks)} z ${season.weeks}`),
+    context(`Season ${season.id} · week ${Math.min(season.weekNumber, season.weeks)} of ${season.weeks}`),
   ];
   if (view.team) {
     const teamScore = view.scoreboard.find((s) => s.team.id === view.team!.id)?.points ?? 0;
     const allowance = view.allowance
-      ? `\nTento týden můžeš ještě poděkovat *${view.allowance.left}×* (z ${view.allowance.total}) – rozdáváš ${copy.resource(view.team.resource)}.`
+      ? `\nThanks left this week: *${view.allowance.left}* of ${view.allowance.total} – you give ${copy.resource(view.team.resource)}.`
       : "";
-    blocks.push(section(`Tým *${view.team.name}* · ${copy.points(teamScore)}${allowance}`));
+    blocks.push(section(`Team *${view.team.name}* · ${copy.points(teamScore)}${allowance}`));
   }
-  blocks.push(section(`*Tvoje suroviny:* ${copy.bag(view.inventory)}`));
+  blocks.push(section(`*Your resources:* ${copy.bag(view.inventory)}`));
   if (view.team && !view.optedOut) {
     blocks.push({
       type: "actions",
       elements: [
-        { type: "button", text: text(":hammer: Stavět"), action_id: IDS.openBuild, style: "primary" },
-        { type: "button", text: text(":handshake: Nabídnout směnu"), action_id: IDS.openOffer },
-        { type: "button", text: text(":bank: Banka"), action_id: IDS.openBank },
+        { type: "button", text: text(":hammer: Build"), action_id: IDS.openBuild, style: "primary" },
+        { type: "button", text: text(":handshake: Offer a trade"), action_id: IDS.openOffer },
+        { type: "button", text: text(":bank: Bank"), action_id: IDS.openBank },
         ...(links
           ? [
               {
                 type: "button" as const,
-                text: text(":world_map: Mapa ve velkém"),
+                text: text(":world_map: Full-size map"),
                 url: links.page,
                 action_id: IDS.mapLink,
               },
@@ -112,11 +112,13 @@ function seasonBlocks(view: PlayerView, links: MapLinks | null): Block[] {
       ],
     });
   }
-  blocks.push(...mapImage(links, "Mapa Osady"));
+  blocks.push(...mapImage(links, "Osada map"));
   if (view.buildings.length) {
-    blocks.push(section(`*Tvoje stavby:* ${view.buildings.map((b) => copy.building(b.kind, b.location)).join(", ")}`));
+    blocks.push(
+      section(`*Your buildings:* ${view.buildings.map((b) => copy.building(b.kind, b.location)).join(", ")}`),
+    );
   }
-  blocks.push(divider, section(`*Pořadí týmů*\n${scoreboardLines(view.scoreboard)}`));
+  blocks.push(divider, section(`*Team standings*\n${scoreboardLines(view.scoreboard)}`));
   blocks.push(...thanksBlocks(view));
   blocks.push(...offerBlocks(view.openOffers));
   return blocks;
@@ -125,12 +127,12 @@ function seasonBlocks(view: PlayerView, links: MapLinks | null): Block[] {
 function thanksBlocks(view: PlayerView): Block[] {
   const blocks: Block[] = [];
   if (view.recentReceived.length) {
-    const lines = view.recentReceived.map((t) => quote(t, `od <@${t.from}>`));
-    blocks.push(divider, section(`*Poděkování pro tebe*\n${lines.join("\n")}`));
+    const lines = view.recentReceived.map((t) => quote(t, `from <@${t.from}>`));
+    blocks.push(divider, section(`*Thanks you received*\n${lines.join("\n")}`));
   }
   if (view.recentGiven.length) {
-    const lines = view.recentGiven.map((t) => quote(t, `pro <@${t.to}>`));
-    blocks.push(divider, section(`*Tvoje poděkování*\n${lines.join("\n")}`));
+    const lines = view.recentGiven.map((t) => quote(t, `to <@${t.to}>`));
+    blocks.push(divider, section(`*Thanks you gave*\n${lines.join("\n")}`));
   }
   return blocks;
 }
@@ -139,14 +141,14 @@ function offerBlocks(offers: OfferView[]): Block[] {
   if (!offers.length) return [];
   return [
     divider,
-    section("*Tvoje otevřené nabídky*"),
+    section("*Your open offers*"),
     ...offers.map(
       (o): Block => ({
         type: "section",
         text: mrkdwn(offerText(o)),
         accessory: {
           type: "button",
-          text: text("Zrušit"),
+          text: text("Cancel"),
           action_id: IDS.cancelOffer,
           value: String(o.id),
           style: "danger",
@@ -163,20 +165,20 @@ export function thanksModal(initialUser: string | undefined, metadata: string): 
     type: "modal",
     callback_id: IDS.thanksModal,
     private_metadata: metadata,
-    title: text("Poděkovat"),
-    submit: text("Poděkovat"),
-    close: text("Zrušit"),
+    title: text("Thank someone"),
+    submit: text("Thank"),
+    close: text("Cancel"),
     blocks: [
       {
         type: "input",
         block_id: "recipient",
-        label: text("Komu děkuješ"),
+        label: text("Who are you thanking?"),
         element: { type: "users_select", action_id: "value", ...(initialUser ? { initial_user: initialUser } : {}) },
       },
       {
         type: "input",
         block_id: "reason",
-        label: text("Za co"),
+        label: text("What for?"),
         element: { type: "plain_text_input", action_id: "value", multiline: true, min_length: 1 },
       },
     ],
@@ -187,32 +189,32 @@ export function buildModal(moves: MoveOption[]): ModalView {
   const affordable = moves.filter((m) => m.payment && m.locations.length);
   const costs = moves
     .map((m) => {
-      const pays = m.payment ? `zaplatíš ${m.payment.map((r) => RESOURCE_NAMES[r]).join(", ")}` : "na to nemáš";
+      const pays = m.payment ? `you pay ${m.payment.map((r) => RESOURCE_NAMES[r]).join(", ")}` : "you can't afford it";
       return `• ${copy.capitalize(copy.BUILDING_NAMES[m.kind])}: ${copy.differentResources(m.cost)} (${pays})`;
     })
     .join("\n");
-  const base = { type: "modal" as const, callback_id: IDS.buildModal, title: text("Stavět"), close: text("Zavřít") };
+  const base = { type: "modal" as const, callback_id: IDS.buildModal, title: text("Build"), close: text("Close") };
   if (!affordable.length) {
     return {
       ...base,
       blocks: [
-        section("Teď nemáš na žádnou stavbu, nebo pro ni není volné místo. Nech si poděkovat, nebo směňuj."),
+        section("You can't afford any building right now, or there's no free spot for one. Get thanked, or trade."),
         context(costs),
       ],
     };
   }
   return {
     ...base,
-    submit: text("Postavit"),
+    submit: text("Build"),
     blocks: [
       {
         type: "input",
         block_id: "location",
-        label: text("Co a kam postavit"),
+        label: text("What to build, and where"),
         element: {
           type: "static_select",
           action_id: "value",
-          placeholder: text("Vyber stavbu a místo na mapě"),
+          placeholder: text("Pick a building and a spot on the map"),
           option_groups: affordable.map((m) => ({
             label: text(copy.capitalize(copy.BUILDING_NAMES[m.kind])),
             options: m.locations
@@ -221,8 +223,8 @@ export function buildModal(moves: MoveOption[]): ModalView {
           })),
         },
       },
-      context(`*Ceny:*\n${costs}`),
-      context("Místa najdeš podle popisků na mapě v záložce Domů."),
+      context(`*Costs:*\n${costs}`),
+      context("Find each spot by its label on the map in the Home tab."),
     ],
   };
 }
@@ -259,20 +261,20 @@ export function offerModal(resources: Resource[]): ModalView {
   return {
     type: "modal",
     callback_id: IDS.offerModal,
-    title: text("Nabídnout směnu"),
-    submit: text("Nabídnout"),
-    close: text("Zrušit"),
+    title: text("Offer a trade"),
+    submit: text("Offer"),
+    close: text("Cancel"),
     blocks: [
-      resourceSelect("give", "Dávám", resources),
-      amountInput("give_amount", "Kolik"),
-      resourceSelect("want", "Chci", resources),
-      amountInput("want_amount", "Kolik"),
+      resourceSelect("give", "I give", resources),
+      amountInput("give_amount", "How many"),
+      resourceSelect("want", "I want", resources),
+      amountInput("want_amount", "How many"),
       {
         type: "input",
         block_id: "to",
         optional: true,
-        label: text("Jen pro (nepovinné)"),
-        hint: text("Když někoho vybereš, nabídka mu přijde soukromě. Jinak ji uvidí celý kanál pro směny."),
+        label: text("Only for (optional)"),
+        hint: text("Pick someone to send them the offer privately. Otherwise the whole trade channel sees it."),
         element: { type: "users_select", action_id: "value" },
       },
     ],
@@ -283,13 +285,13 @@ export function bankModal(resources: Resource[], rate: number): ModalView {
   return {
     type: "modal",
     callback_id: IDS.bankModal,
-    title: text("Banka"),
-    submit: text("Směnit"),
-    close: text("Zrušit"),
+    title: text("Bank"),
+    submit: text("Trade"),
+    close: text("Cancel"),
     blocks: [
-      section(`Banka bere ${rate} stejné suroviny a dá ti 1 surovinu podle tvé volby.`),
-      resourceSelect("give", `Dávám ${rate}×`, resources),
-      resourceSelect("get", "Dostanu 1×", resources),
+      section(`The bank takes ${rate} identical resources and gives you 1 resource of your choice.`),
+      resourceSelect("give", `I give ${rate}×`, resources),
+      resourceSelect("get", "I get 1×", resources),
     ],
   };
 }
@@ -302,18 +304,18 @@ export interface Message {
 }
 
 export function thanksPost(e: EventOf<"ThanksGiven">): Message {
-  const source = e.sourceRef ? ` · <${e.sourceRef}|původní zpráva>` : "";
-  const line = `:raised_hands: <@${e.from}> děkuje <@${e.to}>: „${e.reason}“`;
+  const source = e.sourceRef ? ` · <${e.sourceRef}|original message>` : "";
+  const line = `:raised_hands: <@${e.from}> thanks <@${e.to}>: “${e.reason}”`;
   return {
     text: `${line} (+1 ${copy.resource(e.resource)})`,
-    blocks: [section(line), context(`+1 ${copy.resource(e.resource)} od týmu *${e.fromTeam.name}*${source}`)],
+    blocks: [section(line), context(`+1 ${copy.resource(e.resource)} from team *${e.fromTeam.name}*${source}`)],
   };
 }
 
 export function thanksDm(e: EventOf<"ThanksGiven">, inventory: string): Message {
   const lines = [
-    `:tada: Poděkování od <@${e.from}>: „${e.reason}“`,
-    `Dostáváš 1× ${copy.resource(e.resource)}. Teď máš: ${inventory}.`,
+    `:tada: Thanks from <@${e.from}>: “${e.reason}”`,
+    `You get 1× ${copy.resource(e.resource)}. You now have: ${inventory}.`,
   ];
   if (e.recipientIsNew) lines.push("", copy.WELCOME);
   if (!e.toTeam) lines.push("", copy.NO_TEAM_YET);
@@ -322,25 +324,25 @@ export function thanksDm(e: EventOf<"ThanksGiven">, inventory: string): Message 
 
 export function thanksConfirmation(e: EventOf<"ThanksGiven">): string {
   const left =
-    e.allowanceLeft > 0 ? `Tento týden můžeš poděkovat ještě ${e.allowanceLeft}×.` : "Pro tento týden máš rozdáno.";
-  return `:white_check_mark: Hotovo, <@${e.to}> dostává 1× ${copy.resource(e.resource)}. ${left}`;
+    e.allowanceLeft > 0 ? `Thanks left this week: ${e.allowanceLeft}.` : "You've given all your thanks this week.";
+  return `:white_check_mark: Done, <@${e.to}> gets 1× ${copy.resource(e.resource)}. ${left}`;
 }
 
 export function buildingPost(e: EventOf<"BuildingBuilt">): Message {
   const icon = e.kind === "city" ? ":cityscape:" : ":house:";
   return {
-    text: `${icon} Tým *${e.team.name}* má ${copy.builtAnnouncement(e.kind)} na ${e.location}! Staví <@${e.player}>.`,
+    text: `${icon} Team *${e.team.name}* has a new ${copy.BUILDING_NAMES[e.kind]} at ${e.location}! Built by <@${e.player}>.`,
   };
 }
 
 export function longestRoadPost(e: EventOf<"LongestRoadChanged">): Message {
-  if (!e.team) return { text: `:construction: Tým *${e.previous?.name}* přišel o bonus za nejdelší cestu.` };
-  return { text: `:motorway: Nejdelší cestu má teď tým *${e.team.name}* (+2 body).` };
+  if (!e.team) return { text: `:construction: Team *${e.previous?.name}* lost the longest-road bonus.` };
+  return { text: `:motorway: Team *${e.team.name}* now has the longest road.` };
 }
 
 export function offerText(o: { from: string; to: string | null; give: OfferView["give"]; want: OfferView["want"] }) {
-  const forWhom = o.to ? ` pro <@${o.to}>` : "";
-  return `:handshake: <@${o.from}> nabízí${forWhom} *${copy.bag(o.give)}* za *${copy.bag(o.want)}*`;
+  const forWhom = o.to ? ` to <@${o.to}>` : "";
+  return `:handshake: <@${o.from}> offers${forWhom} *${copy.bag(o.give)}* for *${copy.bag(o.want)}*`;
 }
 
 export function offerMessage(e: EventOf<"OfferCreated">): Message {
@@ -354,12 +356,12 @@ export function offerMessage(e: EventOf<"OfferCreated">): Message {
         elements: [
           {
             type: "button",
-            text: text("Přijmout"),
+            text: text("Accept"),
             action_id: IDS.acceptOffer,
             value: String(e.offerId),
             style: "primary",
           },
-          { type: "button", text: text("Zrušit"), action_id: IDS.cancelOffer, value: String(e.offerId) },
+          { type: "button", text: text("Cancel"), action_id: IDS.cancelOffer, value: String(e.offerId) },
         ],
       },
     ],
@@ -367,45 +369,45 @@ export function offerMessage(e: EventOf<"OfferCreated">): Message {
 }
 
 export function tradeDoneText(e: EventOf<"TradeCompleted">): string {
-  return `:white_check_mark: Směna hotová: <@${e.from}> předává ${copy.bag(e.give)}, <@${e.acceptedBy}> předává ${copy.bag(e.want)}.`;
+  return `:white_check_mark: Trade done: <@${e.from}> gave ${copy.bag(e.give)}, <@${e.acceptedBy}> gave ${copy.bag(e.want)}.`;
 }
 
 export function harvestDm(e: EventOf<"HarvestPaid">): Message {
-  return { text: `:basket: Týdenní sklizeň z tvých staveb: ${copy.bag(e.resources)}.` };
+  return { text: `:basket: Weekly harvest from your buildings: ${copy.bag(e.resources)}.` };
 }
 
 export function digestMessage(digest: WeeklyDigest, links: MapLinks | null): Message {
-  const stories = digest.topThanks.map((t) => `• <@${t.from}> → <@${t.to}>: „${t.reason}“`).join("\n");
+  const stories = digest.topThanks.map((t) => `• <@${t.from}> → <@${t.to}>: “${t.reason}”`).join("\n");
   const harvest = digest.harvest.map((h) => `${h.team.name} ${h.amount}`).join(", ");
   const blocks: Block[] = [
-    header(`Osada – týden ${digest.weekKey}`),
-    section(`Tento týden padlo *${digest.thanksCount}* poděkování.${stories ? `\n${stories}` : ""}`),
-    ...(harvest ? [section(`*Sklizeň:* ${harvest}`)] : []),
-    section(`*Pořadí týmů*\n${scoreboardLines(digest.scoreboard)}`),
-    ...mapImage(links, "Mapa Osady"),
-    ...(links ? [context(`<${links.page}|Mapa ve velkém>`)] : []),
+    header(`Osada – week of ${digest.weekKey}`),
+    section(`*${digest.thanksCount}* thanks were given this week.${stories ? `\n${stories}` : ""}`),
+    ...(harvest ? [section(`*Harvest:* ${harvest}`)] : []),
+    section(`*Team standings*\n${scoreboardLines(digest.scoreboard)}`),
+    ...mapImage(links, "Osada map"),
+    ...(links ? [context(`<${links.page}|Full-size map>`)] : []),
   ];
-  return { text: `Osada – shrnutí týdne ${digest.weekKey}`, blocks };
+  return { text: `Osada – weekly digest for ${digest.weekKey}`, blocks };
 }
 
 function winnerNames(result: SeasonResult): string {
-  return result.winners.length ? result.winners.map((t) => `*${t.name}*`).join(" a ") : "bez vítěze";
+  return result.winners.length ? result.winners.map((t) => `*${t.name}*`).join(" and ") : "no winner";
 }
 
 export function seasonEndMessage(seasonId: number, result: SeasonResult, links: MapLinks | null): Message {
   const highlights = [
-    `Celkem poděkování: *${result.totalThanks}*`,
-    result.mostThanked && `Nejvíc poděkování: <@${result.mostThanked.player}> (${result.mostThanked.count}×)`,
+    `Thanks given: *${result.totalThanks}*`,
+    result.mostThanked && `Most thanked: <@${result.mostThanked.player}> (${result.mostThanked.count}×)`,
     result.mostCrossTeamThanks &&
-      `Nejvíc díků napříč týmy rozdává <@${result.mostCrossTeamThanks.player}> (${result.mostCrossTeamThanks.count}×)`,
+      `Most cross-team thanks given: <@${result.mostCrossTeamThanks.player}> (${result.mostCrossTeamThanks.count}×)`,
   ].filter(Boolean);
   const blocks: Block[] = [
-    header(`Konec sezóny ${seasonId}!`),
-    section(`:trophy: Vítěz: ${winnerNames(result)}`),
-    section(`*Konečné pořadí*\n${scoreboardLines(result.scoreboard)}`),
+    header(`Season ${seasonId} is over!`),
+    section(`:trophy: Winner: ${winnerNames(result)}`),
+    section(`*Final standings*\n${scoreboardLines(result.scoreboard)}`),
     section(highlights.join("\n")),
-    ...mapImage(links, "Konečná mapa"),
-    context("Inventáře se vynulovaly. Další sezónu spustí admin."),
+    ...mapImage(links, "Final map"),
+    context("Inventories have been reset. An admin will start the next season."),
   ];
-  return { text: `Konec sezóny ${seasonId}! Vítěz: ${winnerNames(result)}`, blocks };
+  return { text: `Season ${seasonId} is over! Winner: ${winnerNames(result)}`, blocks };
 }

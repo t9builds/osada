@@ -5,8 +5,8 @@ import { eventOf } from "./types.ts";
 async function tradingGame() {
   const ctx = await startedGame();
   // Received resources only: e1 holds 3 wool, s1 holds 2 ore.
-  for (const from of ["d1", "d2", "d3"]) expectOk(await ctx.game.thank(from, "e1", "Díky za pomoc"));
-  for (const from of ["e2", "e3"]) expectOk(await ctx.game.thank(from, "s1", "Díky za pomoc"));
+  for (const from of ["d1", "d2", "d3"]) expectOk(await ctx.game.thank(from, "e1", "Thanks for the help"));
+  for (const from of ["e2", "e3"]) expectOk(await ctx.game.thank(from, "s1", "Thanks for the help"));
   return ctx;
 }
 

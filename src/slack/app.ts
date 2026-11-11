@@ -10,9 +10,9 @@ export function registerSlack(app: App, deps: SlackDeps): Notifier {
   // Bolt's argument types are wider unions than the handlers read; the handlers type only the fields they use.
   const as = <T>(handler: (args: T) => Promise<unknown>) => handler as (args: any) => Promise<void>;
 
-  app.command("/dekuju", as(h.thanksCommand));
-  app.command("/stavet", as(h.buildCommand));
-  app.command("/smena", as(h.tradeCommand));
+  app.command("/thanks", as(h.thanksCommand));
+  app.command("/build", as(h.buildCommand));
+  app.command("/trade", as(h.tradeCommand));
   app.command("/osada", as(h.osadaCommand));
   app.command("/osada-admin", as(h.adminCommand));
   app.shortcut(IDS.thanksShortcut, as(h.thanksShortcut));

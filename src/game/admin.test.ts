@@ -46,13 +46,13 @@ describe("players", () => {
     expect(view.allowance).toBeNull();
     expect(await game.legalMoves("d1")).toEqual({ ok: false, reason: "OPTED_OUT" });
     expectOk(await game.setOptOut("d1", false));
-    expectOk(await game.thank("e1", "d1", "Vítej zpátky"));
+    expectOk(await game.thank("e1", "d1", "Welcome back"));
   });
 
   test("a newcomer is flagged until they take part", async () => {
     const { game } = await startedGame();
     expect((await game.playerView("e1")).isNewcomer).toBe(true);
-    expectOk(await game.thank("e1", "d1", "Díky za pomoc"));
+    expectOk(await game.thank("e1", "d1", "Thanks for the help"));
     expect((await game.playerView("e1")).isNewcomer).toBe(false);
     expect((await game.playerView("nobody")).team).toBeNull();
   });
@@ -61,19 +61,19 @@ describe("players", () => {
 describe("grants and the audit log", () => {
   test("an admin grant adds resources and is logged with its note", async () => {
     const { game } = await startedGame();
-    const event = eventOf(await game.grant("d1", "ore", 2, "Výhra v kvízu"), "ResourceGranted");
+    const event = eventOf(await game.grant("d1", "ore", 2, "Quiz prize"), "ResourceGranted");
     expect(event).toMatchObject({ player: "d1", resource: "ore", amount: 2 });
     expect((await game.playerView("d1")).inventory).toEqual({ ore: 2 });
-    expect((await game.auditLog())[0]).toMatchObject({ player: "d1", delta: 2, kind: "grant", note: "Výhra v kvízu" });
+    expect((await game.auditLog())[0]).toMatchObject({ player: "d1", delta: 2, kind: "grant", note: "Quiz prize" });
     expect(await game.grant("d1", "glass", 1, "x")).toEqual({ ok: false, reason: "RESOURCE_NOT_IN_PLAY" });
     expect(await game.grant("d1", "ore", 0, "x")).toEqual({ ok: false, reason: "INVALID_AMOUNT" });
   });
 
   test("every resource movement is in the log", async () => {
     const { game } = await startedGame();
-    expectOk(await game.thank("d1", "e1", "Díky za pomoc"));
-    expectOk(await game.thank("d2", "e1", "Díky za pomoc"));
-    expectOk(await game.thank("d3", "e1", "Díky za pomoc"));
+    expectOk(await game.thank("d1", "e1", "Thanks for the help"));
+    expectOk(await game.thank("d2", "e1", "Thanks for the help"));
+    expectOk(await game.thank("d3", "e1", "Thanks for the help"));
     expectOk(await game.bankTrade("e1", "wool", "grain"));
     const log = await game.auditLog({ player: "e1" });
     expect(log.map((e) => [e.kind, e.resource, e.delta])).toEqual([

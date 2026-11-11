@@ -93,10 +93,10 @@ function legend(scoreboard: TeamScore[], longestRoadTeamId: number | null, top: 
   return scoreboard
     .map((s, i) => {
       const y = top + i * LEGEND_LINE;
-      const bonus = s.team.id === longestRoadTeamId ? " · nejdelší cesta" : "";
+      const bonus = s.team.id === longestRoadTeamId ? " · longest road" : "";
       return [
         `<rect x="${MARGIN}" y="${y - 13}" width="16" height="16" rx="3" fill="${s.team.color}" stroke="#ffffff"/>`,
-        `<text x="${MARGIN + 24}" y="${y}" font-size="15" fill="#ffffff">${escapeXml(s.team.name)}: ${s.points} b.${bonus}</text>`,
+        `<text x="${MARGIN + 24}" y="${y}" font-size="15" fill="#ffffff">${escapeXml(s.team.name)}: ${s.points} pts${bonus}</text>`,
       ].join("");
     })
     .join("\n");

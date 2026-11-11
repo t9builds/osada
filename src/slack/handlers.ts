@@ -1,6 +1,6 @@
 /**
  * Slack entry points: slash commands, the message shortcut, modal submissions and buttons. Each parses its payload,
- * calls the game service, and replies; game rules live in the service, Czech copy in `copy.ts` and `views.ts`.
+ * calls the game service, and replies; game rules live in the service, copy in `copy.ts` and `views.ts`.
  */
 import type { types } from "@slack/bolt";
 import { isResource, type Resource } from "../engine/resources.ts";
@@ -140,7 +140,7 @@ export function createHandlers(deps: SlackDeps, notifier: Notifier) {
 
     async tradeCommand({ command, ack, respond }: CommandArgs) {
       await ack();
-      const bank = command.text.trim().toLowerCase() === "banka";
+      const bank = command.text.trim().toLowerCase() === "bank";
       await openTrade(bank, command.trigger_id, (text) => respond(ephemeral(text)));
     },
 
@@ -151,7 +151,7 @@ export function createHandlers(deps: SlackDeps, notifier: Notifier) {
       if (!to && !(await game.config()).tradeChannel) {
         return ack({
           response_action: "errors",
-          errors: { to: "Kanál pro směny zatím není nastavený – vyber konkrétního hráče." },
+          errors: { to: "No trade channel is set up yet – pick a specific player." },
         });
       }
       if (!isResource(give) || !isResource(want))
@@ -205,7 +205,7 @@ export function createHandlers(deps: SlackDeps, notifier: Notifier) {
         if (respond && body.channel) await respond({ ...ephemeral(text), replace_original: false });
         return notifier.refreshHome(body.user.id);
       }
-      await updateMessage(body, ":x: Nabídka byla zrušena.");
+      await updateMessage(body, ":x: Offer cancelled.");
       await notifier.publish(result.events);
     },
 
@@ -217,7 +217,7 @@ export function createHandlers(deps: SlackDeps, notifier: Notifier) {
     async adminCommand({ command, ack, respond }: CommandArgs) {
       await ack();
       if (!deps.admins.includes(command.user_id)) {
-        await respond(ephemeral("Tohle může jen admin hry."));
+        await respond(ephemeral("Only a game admin can do that."));
         return;
       }
       const { reply, events } = await runAdminCommand(deps, command.text);
@@ -243,25 +243,25 @@ export function createHandlers(deps: SlackDeps, notifier: Notifier) {
 
   async function osada(player: string, sub: string): Promise<string> {
     switch (sub) {
-      case "stav":
+      case "status":
         return status(player);
-      case "mapa": {
+      case "map": {
         const links = await notifier.mapLinks();
-        return links ? `:world_map: <${links.page}|Mapa ve velkém>` : "Mapa zatím není k dispozici.";
+        return links ? `:world_map: <${links.page}|Full-size map>` : "The map isn't available yet.";
       }
-      case "historie": {
+      case "history": {
         const history = await game.seasonHistory();
-        if (!history.length) return "Zatím neskončila žádná sezóna.";
+        if (!history.length) return "No season has ended yet.";
         return history
-          .map((s) => `• Sezóna ${s.id}: ${s.result.winners.map((t) => `*${t.name}*`).join(" a ") || "bez vítěze"}`)
+          .map((s) => `• Season ${s.id}: ${s.result.winners.map((t) => `*${t.name}*`).join(" and ") || "no winner"}`)
           .join("\n");
       }
-      case "odhlasit":
+      case "leave":
         await publish(await game.setOptOut(player, true));
-        return "Hru máš vypnutou. Nikdo ti nemůže poděkovat a ty nemůžeš hrát. Zpátky se vrátíš přes `/osada prihlasit`.";
-      case "prihlasit":
+        return "You've left the game. Nobody can thank you and you can't play. Come back with `/osada join`.";
+      case "join":
         await publish(await game.setOptOut(player, false));
-        return "Vítej zpátky ve hře! :tada:";
+        return "Welcome back to the game! :tada:";
       default:
         return copy.help(await game.config());
     }
@@ -271,10 +271,12 @@ export function createHandlers(deps: SlackDeps, notifier: Notifier) {
     const view = await game.playerView(player);
     if (!view.season) return copy.REJECTIONS.NO_ACTIVE_SEASON;
     const lines = [
-      view.team ? `Tým: *${view.team.name}*` : copy.NO_TEAM_YET,
-      `Suroviny: ${copy.bag(view.inventory)}`,
-      view.allowance ? `Tento týden můžeš ještě poděkovat ${view.allowance.left}× (z ${view.allowance.total}).` : "",
-      view.buildings.length ? `Stavby: ${view.buildings.map((b) => copy.building(b.kind, b.location)).join(", ")}` : "",
+      view.team ? `Team: *${view.team.name}*` : copy.NO_TEAM_YET,
+      `Resources: ${copy.bag(view.inventory)}`,
+      view.allowance ? `Thanks left this week: ${view.allowance.left} of ${view.allowance.total}.` : "",
+      view.buildings.length
+        ? `Buildings: ${view.buildings.map((b) => copy.building(b.kind, b.location)).join(", ")}`
+        : "",
     ];
     return lines.filter(Boolean).join("\n");
   }

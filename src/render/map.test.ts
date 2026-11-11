@@ -7,11 +7,11 @@ describe("map rendering", () => {
   test("draws every tile with its resource, every vertex label, and the starting buildings", async () => {
     const { game } = await startedGame({ seed: 42 });
     const board = (await game.board())!;
-    const svg = renderMapSvg(board, { title: "Osada – sezóna 1" });
+    const svg = renderMapSvg(board, { title: "Osada – season 1" });
     expect(svg.match(/class="tile /g)).toHaveLength(19);
     expect(svg.match(/class="tile tile-desert"/g)).toHaveLength(1);
-    expect(svg).toContain(">Ruda<");
-    expect(svg).toContain(">Pustina<");
+    expect(svg).toContain(">Ore<");
+    expect(svg).toContain(">Desert<");
     expect(svg.match(/class="vertex-label"/g)).toHaveLength(54);
     expect(svg).toContain(">A1<");
     for (const b of board.buildings) expect(svg).toContain(`data-location="${b.location}"`);
@@ -25,7 +25,7 @@ describe("map rendering", () => {
     const svg = renderMapSvg(board, { title: "Osada" });
     const start = board.buildings.find((b) => b.kind === "settlement" && b.teamId === 1)!;
     expect(svg).toMatch(new RegExp(`class="settlement" data-location="${start.location}"[^>]*fill="#d94f30"`));
-    expect(svg).toContain("Engineering: 4 b.");
+    expect(svg).toContain("Engineering: 4 pts");
   });
 
   test("escapes team names", async () => {

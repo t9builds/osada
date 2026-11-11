@@ -67,8 +67,8 @@ export class Notifier {
     switch (e.type) {
       case "SeasonStarted": {
         const links = await this.mapLinks(e.seasonId);
-        const image = links ? [{ type: "image" as const, image_url: links.image, alt_text: "Mapa Osady" }] : [];
-        const message = `:tada: Začíná sezóna ${e.seasonId} Osady! Hraje se ${e.weeks} týdnů. Děkuj kolegům přes \`/dekuju\` a stav na mapě přes \`/stavet\`.`;
+        const image = links ? [{ type: "image" as const, image_url: links.image, alt_text: "Osada map" }] : [];
+        const message = `:tada: Season ${e.seasonId} of Osada starts now and runs for ${e.weeks} weeks! Thank colleagues with \`/thanks\` and build on the map with \`/build\`.`;
         await this.post(gameChannel, {
           text: message,
           blocks: [{ type: "section", text: { type: "mrkdwn", text: message } }, ...image],
@@ -80,11 +80,11 @@ export class Notifier {
         return [];
       case "PlayerAssigned":
         await this.post(e.player, {
-          text: `:busts_in_silhouette: Jsi v týmu *${e.team.name}*. Rozdáváš ${copy.resource(e.team.resource)}. Pravidla: \`/osada pomoc\``,
+          text: `:busts_in_silhouette: You're on team *${e.team.name}*. You give ${copy.resource(e.team.resource)}. Rules: \`/osada help\``,
         });
         return [e.player];
       case "ResourceGranted":
-        await this.post(e.player, { text: `:gift: Dostáváš ${e.amount}× ${copy.resource(e.resource)}: ${e.note}` });
+        await this.post(e.player, { text: `:gift: You get ${e.amount}× ${copy.resource(e.resource)}: ${e.note}` });
         return [e.player];
       case "BankTradeCompleted":
         return [e.player];

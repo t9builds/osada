@@ -10,7 +10,7 @@ export function renderMapPage(board: BoardView, svg: string, title: string): str
     )
     .join("");
   return `<!doctype html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,7 +26,7 @@ export function renderMapPage(board: BoardView, svg: string, title: string): str
 </head>
 <body><main>
 ${svg}
-<table><thead><tr><th>Tým</th><th>Stavby</th><th>Bonus</th><th>Body</th></tr></thead><tbody>${rows}</tbody></table>
+<table><thead><tr><th>Team</th><th>Buildings</th><th>Bonus</th><th>Points</th></tr></thead><tbody>${rows}</tbody></table>
 </main></body>
 </html>`;
 }

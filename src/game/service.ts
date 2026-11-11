@@ -594,8 +594,8 @@ async function requireTeamPlayer(tx: Database, id: PlayerId, now: Date): Promise
 }
 
 async function teamByName(db: Database, name: string): Promise<TeamRef | undefined> {
-  const wanted = name.trim().toLocaleLowerCase("cs");
-  return (await repo.teams(db)).find((x) => x.name.toLocaleLowerCase("cs") === wanted);
+  const wanted = name.trim().toLocaleLowerCase("en");
+  return (await repo.teams(db)).find((x) => x.name.toLocaleLowerCase("en") === wanted);
 }
 
 async function resourcesInPlay(db: Database): Promise<Resource[]> {
@@ -704,7 +704,7 @@ async function liveScoreboard(db: Database, season: Season, config: GameConfig):
       const bonus = season.longestRoadTeamId === team.id ? config.longestRoadBonus : 0;
       return { team, points: fromBuildings + bonus, buildingPoints: fromBuildings, bonus };
     })
-    .sort((a, b) => b.points - a.points || a.team.name.localeCompare(b.team.name, "cs"));
+    .sort((a, b) => b.points - a.points || a.team.name.localeCompare(b.team.name, "en"));
 }
 
 async function closeSeason(tx: Database, season: Season, config: GameConfig, now: Date): Promise<GameEvent[]> {
