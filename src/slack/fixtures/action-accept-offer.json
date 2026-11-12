@@ -1,0 +1,21 @@
+{
+  "type": "block_actions",
+  "user": { "id": "s1", "username": "sam", "name": "sam", "team_id": "T0001" },
+  "api_app_id": "A0OSADA",
+  "container": { "type": "message", "message_ts": "1731320000.000100", "channel_id": "C0TRADE", "is_ephemeral": false },
+  "trigger_id": "1.2.ghi",
+  "team": { "id": "T0001", "domain": "acme" },
+  "channel": { "id": "C0TRADE", "name": "osada-trades" },
+  "message": { "type": "message", "ts": "1731320000.000100", "text": "offer" },
+  "response_url": "https://hooks.slack.com/actions/T0001/2/xyz",
+  "actions": [
+    {
+      "action_id": "accept_offer",
+      "block_id": "b1",
+      "text": { "type": "plain_text", "text": "Accept" },
+      "value": "1",
+      "type": "button",
+      "action_ts": "1731320010.000200"
+    }
+  ]
+}

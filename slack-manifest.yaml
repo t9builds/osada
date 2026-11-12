@@ -1,0 +1,69 @@
+# Slack app manifest for Osada. Paste it at https://api.slack.com/apps → Create New App → From a manifest.
+# It starts in Socket Mode for local development. For production (HTTP mode), set `socket_mode_enabled: false`
+# and replace https://osada.example.com with your server's public URL everywhere below.
+display_information:
+  name: Osada
+  description: Thank colleagues with resources and build a settlement together.
+  background_color: "#2f6b8f"
+  long_description: >-
+    Osada is a thank-you game. When someone helps you, send /thanks @colleague for what, and they receive your
+    team's resource. Resources from others build roads, settlements and cities on a shared hex map. Points go to
+    teams, and the team with the most points at the end of the season wins. /osada help explains the rules.
+features:
+  app_home:
+    home_tab_enabled: true
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: true
+  bot_user:
+    display_name: Osada
+    always_online: true
+  shortcuts:
+    - name: Thank
+      type: message
+      callback_id: thank
+      description: Thank the message's author and send them a resource
+  slash_commands:
+    - command: /thanks
+      url: https://osada.example.com/slack/events
+      description: Thank a colleague and send them your team's resource
+      usage_hint: "@colleague what you're thanking them for"
+      should_escape: true
+    - command: /build
+      url: https://osada.example.com/slack/events
+      description: Build a road, settlement or city
+      should_escape: true
+    - command: /trade
+      url: https://osada.example.com/slack/events
+      description: Offer a resource trade, or trade with the bank
+      usage_hint: "[bank]"
+      should_escape: true
+    - command: /osada
+      url: https://osada.example.com/slack/events
+      description: Rules and your game status
+      usage_hint: "help | status | map | history | leave | join"
+      should_escape: true
+    - command: /osada-admin
+      url: https://osada.example.com/slack/events
+      description: Manage the game (admins only)
+      usage_hint: "help"
+      should_escape: true
+oauth_config:
+  scopes:
+    bot:
+      - commands
+      - chat:write
+      - chat:write.public
+      - users:read
+      - usergroups:read
+      - im:write
+settings:
+  event_subscriptions:
+    request_url: https://osada.example.com/slack/events
+    bot_events:
+      - app_home_opened
+  interactivity:
+    is_enabled: true
+    request_url: https://osada.example.com/slack/events
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false
